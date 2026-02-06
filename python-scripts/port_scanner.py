@@ -6,7 +6,7 @@ ports=[21,22,23,80,443]
 print(f"\nScanning target: {target}\n")
 for port in ports:
     try:
-      s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(1)
         result = s.connect_ex((target, port))
         if result == 0:
