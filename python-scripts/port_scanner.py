@@ -1,19 +1,48 @@
 # Port Scanner - Advanced (Educational purposes only)
 # Author: Hasan Islamli
 # Version: v4
-
+import argparse
 import socket
 import threading
 import datetime
 from queue import Queue
 
 # ---------------- CONFIG ----------------
-TARGET = input("Target IP / Domain: ")
-START_PORT = 1
-END_PORT = 1024
-THREAD_COUNT = 100
-TIMEOUT = 1
-OUTPUT_FILE = "scan_results.txt"
+parser = argparse.ArgumentParser(
+    description="Advanced Port Scanner (Educational purposes only)"
+)
+
+parser.add_argument(
+    "-t", "--target",
+    required=True,
+    help="Target IP or domain"
+)
+
+parser.add_argument(
+    "-p", "--ports",
+    default="1-1024",
+    help="Port range (default: 1-1024)"
+)
+
+parser.add_argument(
+    "--threads",
+    type=int,
+    default=100,
+    help="Number of threads (default: 100)"
+)
+
+args = parser.parse_args()
+
+TARGET = args.target
+THREAD_COUNT = args.threads
+
+# Port range parsing
+try:
+    START_PORT, END_PORT = map(int, args.ports.split("-"))
+except:
+    print("[!] Invalid port range format. Example: 1-1000")
+    exit()
+
 
 COMMON_PORTS = {
     21: "FTP", 22: "SSH", 23: "Telnet", 25: "SMTP",
@@ -114,14 +143,17 @@ def worker():
         queue.task_done()
 
 # ---------------- MAIN ----------------
+# ---------------- MAIN ----------------
 
 output = open(OUTPUT_FILE, "w")
 output.write(f"Scan Target: {TARGET}\n")
 output.write(f"Ports: {START_PORT}-{END_PORT}\n")
+output.write(f"Threads: {THREAD_COUNT}\n")
 output.write("=" * 50 + "\n")
 
 print(f"\n[*] Scanning target: {TARGET}")
 print(f"[*] Ports: {START_PORT}-{END_PORT}")
+print(f"[*] Threads: {THREAD_COUNT}")
 print("[*] Scanning started...\n")
 
 try:
