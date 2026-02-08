@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Advanced Port Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h2>🔐 Advanced Port Scanner</h2>
+
+<table border="1">
+    <tr>
+        <th>Port</th>
+        <th>Service</th>
+        <th>Risk</th>
+        <th>Banner</th>
+    </tr>
+
+    {% for r in results %}
+    <tr>
+        <td>{{ r.port }}</td>
+        <td>{{ r.service }}</td>
+        <td>{{ r.risk }}</td>
+        <td>{{ r.banner }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
