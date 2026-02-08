@@ -127,6 +127,7 @@ def main():
     type=int,
     default=100,
     help="Number of threads (default: 100)"
+    )
 
     args = parser.parse_args()
 
