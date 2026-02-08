@@ -88,10 +88,12 @@ def scan_port(port):
             output.write(message + "\n")
 
         sock.close()
-    except Exception as e:
+        except Exception as e:
     error_time = datetime.datetime.now()
     with open("error.log", "a") as err:
         err.write(f"[{error_time}] Port {port} error: {e}\n")
+
+    
         
        
 
@@ -104,24 +106,22 @@ def worker():
 
 # ---------------- MAIN ----------------
 
-output = open(OUTPUT_FILE, "w")
-output.write(f"Scan Target: {TARGET}\n")
-output.write(f"Ports: {START_PORT}-{END_PORT}\n")
-output.write("=" * 50 + "\n")
+try:
+    for port in range(START_PORT, END_PORT + 1):
+        queue.put(port)
 
-print(f"\n[*] Scanning target: {TARGET}")
-print("[*] Scanning started...\n")
+    for _ in range(THREAD_COUNT):
+        threading.Thread(target=worker, daemon=True).start()
 
-for port in range(START_PORT, END_PORT + 1):
-    queue.put(port)
+    queue.join()
+    print("\n[✓] Scan completed.")
 
-for _ in range(THREAD_COUNT):
-    threading.Thread(target=worker, daemon=True).start()
-
-queue.join()
 except KeyboardInterrupt:
     print("\n[!] Scan interrupted by user (Ctrl+C)")
+
 finally:
-output.close()
+    output.close()
+    print(f"[✓] Results saved to {OUTPUT_FILE}")
+
 print(f"\n[✓] Scan completed.")
 print(f"[✓] Results saved to {OUTPUT_FILE}")
