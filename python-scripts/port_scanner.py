@@ -11,6 +11,7 @@ START_PORT = 1
 END_PORT = 1024
 THREAD_COUNT = 100
 TIMEOUT = 1
+OUTPUT_FILE = "scan_results.txt"
 
 # Known services
 COMMON_PORTS = {
@@ -111,6 +112,16 @@ def scan_port(port):
     f"Risk: {risk:<7} | "
     f"Banner: {banner}"
 )
+        output.write(
+    f"[+] Port {port:<5} OPEN | "
+    f"Service: {service:<10} | "
+    f"Risk: {risk:<7} | "
+    f"Banner: {banner}\n"
+)
+        output.close()
+print(f"[✓] Results saved to {OUTPUT_FILE}")
+
+
 
 
         sock.close()
@@ -125,7 +136,10 @@ def worker():
         queue.task_done()
 
 # ---------------- MAIN ----------------
-
+output = open(OUTPUT_FILE, "w")
+output.write(f"Scan Target: {TARGET}\n")
+output.write(f"Ports: {START_PORT}-{END_PORT}\n")
+output.write("=" * 50 + "\n")
 print(f"\n[*] Scanning target: {TARGET}")
 print(f"[*] Ports: {START_PORT}-{END_PORT}")
 print("[*] Scanning started...\n")
