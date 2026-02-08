@@ -1,7 +1,7 @@
 # Port Scanner - Advanced (Educational purposes only)
 # Author: Hasan Islamli
 # Version: v4
-
+import datetime
 import socket
 import threading
 from queue import Queue
@@ -88,8 +88,12 @@ def scan_port(port):
             output.write(message + "\n")
 
         sock.close()
-    except:
-        pass
+    except Exception as e:
+    error_time = datetime.datetime.now()
+    with open("error.log", "a") as err:
+        err.write(f"[{error_time}] Port {port} error: {e}\n")
+        
+       
 
 
 def worker():
@@ -115,7 +119,9 @@ for _ in range(THREAD_COUNT):
     threading.Thread(target=worker, daemon=True).start()
 
 queue.join()
+except KeyboardInterrupt:
+    print("\n[!] Scan interrupted by user (Ctrl+C)")
+finally:
 output.close()
-
 print(f"\n[✓] Scan completed.")
 print(f"[✓] Results saved to {OUTPUT_FILE}")
