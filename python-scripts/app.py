@@ -1,21 +1,11 @@
-from flask import Flask, render_template, request
-from scanner import scan
+from flask import Flask, render_template
+from python_scripts.scanner import scan_results
 
-app = Flask(__name__,
-            template_folder="templates",
-    static_folder="static"
-)
+app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
 def index():
-    results = []
-    if request.method == "POST":
-        target = request.form["target"]
-        start_port = int(request.form["start_port"])
-        end_port = int(request.form["end_port"])
-
-        results = scan(target, start_port, end_port)
-
+    results = scan_results()
     return render_template("index.html", results=results)
 
 if __name__ == "__main__":
