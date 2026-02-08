@@ -1,41 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Advanced Port Scanner</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>🔐 Advanced Port Scanner</h1>
+<h2>🔐 Advanced Port Scanner</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Port</th>
-            <th>Service</th>
-            <th>Risk</th>
-            <th>Banner</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for r in results %}
-        <tr>
-            <td>{{ r.port }}</td>
-            <td>{{ r.service }}</td>
+<table border="1">
+    <tr>
+        <th>Port</th>
+        <th>Service</th>
+        <th>Risk</th>
+        <th>Banner</th>
+    </tr>
 
-            {% if r.risk == "HIGH" %}
-                <td class="risk-high">{{ r.risk }}</td>
-            {% elif r.risk == "MEDIUM" %}
-                <td class="risk-medium">{{ r.risk }}</td>
-            {% else %}
-                <td class="risk-low">{{ r.risk }}</td>
-            {% endif %}
-
-            <td class="banner">{{ r.banner }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+    {% for r in results %}
+    <tr>
+        <td>{{ r.port }}</td>
+        <td>{{ r.service }}</td>
+        <td>{{ r.risk }}</td>
+        <td>{{ r.banner }}</td>
+    </tr>
+    {% endfor %}
 </table>
 
 </body>
