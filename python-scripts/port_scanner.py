@@ -122,11 +122,21 @@ def main():
     parser.add_argument("-t", "--target", required=True, help="Target IP or domain")
     parser.add_argument("-p", "--ports", default="1-1024", help="Port range (default: 1-1024)")
     parser.add_argument("--json", action="store_true", help="Save output as JSON")
+    parser.add_argument(
+    "--threads",
+    type=int,
+    default=100,
+    help="Number of threads (default: 100)"
 
     args = parser.parse_args()
 
     target = args.target
     port_range = args.ports
+    args = parser.parse_args()
+
+TARGET = args.target
+THREAD_COUNT = args.threads
+
     start_port, end_port = map(int, port_range.split("-"))
 
     print("\n[*] Target :", target)
