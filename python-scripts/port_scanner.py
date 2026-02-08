@@ -1,30 +1,35 @@
+# Advanced Port Scanner (Educational Purpose)
 # Author: Hesen Islamli
-# Basic Port Scanner(Educational Purposes Only)
-# Work in Progress
+# Version: v3
+
 import socket
 
-target = input("Enter target IP or hostname: ")
-ports = [21, 22, 23, 80, 443]
-
-print(f"\nScanning target: {target}\n")
-
-for port in ports:
+def scan_port(target, port):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(1)
         result = s.connect_ex((target, port))
-
-        if result == 0:
-            print(f"Port {port} is OPEN")
-
         s.close()
+        return result == 0
+    except:
+        return False
 
-    except KeyboardInterrupt:
-        print("Scan interrupted")
-        break
-    except socket.gaierror:
-        print("Hostname could not be resolved")
-        break
-    except socket.error:
-        print("Could not connect to server")
-        break
+def main():
+    target = input("Enter target IP or hostname: ")
+
+    try:
+        start_port = int(input("Enter start port: "))
+        end_port = int(input("Enter end port: "))
+    except ValueError:
+        print("Invalid port number.")
+        return
+
+    print(f"\nScanning {target} from port {start_port} to {end_port}\n")
+
+    for port in range(start_port, end_port + 1):
+        if scan_port(target, port):
+            print(f"[OPEN] Port {port}")
+
+if __name__ == "__main__":
+    main()
+
