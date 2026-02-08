@@ -1,9 +1,10 @@
 # Port Scanner - Advanced (Educational purposes only)
 # Author: Hasan Islamli
 # Version: v4
-import datetime
+
 import socket
 import threading
+import datetime
 from queue import Queue
 
 # ---------------- CONFIG ----------------
@@ -23,10 +24,16 @@ COMMON_PORTS = {
 }
 
 RISK_LEVELS = {
-    "FTP": "HIGH", "Telnet": "HIGH", "rexec": "HIGH",
-    "rlogin": "HIGH", "rsh": "HIGH",
-    "SMB": "MEDIUM", "NetBIOS": "MEDIUM",
-    "HTTP": "LOW", "SSH": "LOW", "SMTP": "LOW",
+    "FTP": "HIGH",
+    "Telnet": "HIGH",
+    "rexec": "HIGH",
+    "rlogin": "HIGH",
+    "rsh": "HIGH",
+    "SMB": "MEDIUM",
+    "NetBIOS": "MEDIUM",
+    "HTTP": "LOW",
+    "SSH": "LOW",
+    "SMTP": "LOW",
     "RPC": "LOW"
 }
 
@@ -45,12 +52,15 @@ def grab_banner(sock):
 def grab_http_banner(target, port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(3)
         sock.connect((target, port))
+
         request = (
             f"GET / HTTP/1.1\r\n"
             f"Host: {target}\r\n"
             f"Connection: close\r\n\r\n"
         )
+
         sock.sendall(request.encode())
         response = sock.recv(4096).decode(errors="ignore")
         sock.close()
@@ -58,6 +68,7 @@ def grab_http_banner(target, port):
         for line in response.split("\r\n"):
             if line.lower().startswith("server:"):
                 return line
+
         return "HTTP server (no header)"
     except:
         return "HTTP banner grab failed"
@@ -66,6 +77,7 @@ def grab_http_banner(target, port):
 def scan_port(port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(TIMEOUT)
         result = sock.connect_ex((TARGET, port))
 
         if result == 0:
@@ -88,14 +100,11 @@ def scan_port(port):
             output.write(message + "\n")
 
         sock.close()
-        except Exception as e:
-    error_time = datetime.datetime.now()
-    with open("error.log", "a") as err:
-        err.write(f"[{error_time}] Port {port} error: {e}\n")
 
-    
-        
-       
+    except Exception as e:
+        error_time = datetime.datetime.now()
+        with open("error.log", "a") as err:
+            err.write(f"[{error_time}] Port {port} error: {e}\n")
 
 
 def worker():
@@ -105,6 +114,15 @@ def worker():
         queue.task_done()
 
 # ---------------- MAIN ----------------
+
+output = open(OUTPUT_FILE, "w")
+output.write(f"Scan Target: {TARGET}\n")
+output.write(f"Ports: {START_PORT}-{END_PORT}\n")
+output.write("=" * 50 + "\n")
+
+print(f"\n[*] Scanning target: {TARGET}")
+print(f"[*] Ports: {START_PORT}-{END_PORT}")
+print("[*] Scanning started...\n")
 
 try:
     for port in range(START_PORT, END_PORT + 1):
@@ -122,6 +140,3 @@ except KeyboardInterrupt:
 finally:
     output.close()
     print(f"[✓] Results saved to {OUTPUT_FILE}")
-
-print(f"\n[✓] Scan completed.")
-print(f"[✓] Results saved to {OUTPUT_FILE}")
