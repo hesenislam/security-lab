@@ -1,13 +1,17 @@
 # Port Scanner - Advanced (Educational purposes only)
 # Author: Hasan Islamli
-# Version: v4
-import argparse
+# Version: v5
+
 import socket
 import threading
 import datetime
+import argparse
+import json
+import csv
 from queue import Queue
 
-# ---------------- CONFIG ----------------
+# ---------------- ARGUMENTS ----------------
+
 parser = argparse.ArgumentParser(
     description="Advanced Port Scanner (Educational purposes only)"
 )
@@ -36,13 +40,18 @@ args = parser.parse_args()
 TARGET = args.target
 THREAD_COUNT = args.threads
 
-# Port range parsing
 try:
     START_PORT, END_PORT = map(int, args.ports.split("-"))
 except:
     print("[!] Invalid port range format. Example: 1-1000")
     exit()
 
+# ---------------- CONFIG ----------------
+
+TIMEOUT = 1
+OUTPUT_FILE = "scan_results.txt"
+JSON_FILE = "scan_results.json"
+CSV_FILE = "scan_results.csv"
 
 COMMON_PORTS = {
     21: "FTP", 22: "SSH", 23: "Telnet", 25: "SMTP",
@@ -67,6 +76,7 @@ RISK_LEVELS = {
 }
 
 queue = Queue()
+results = []
 socket.setdefaulttimeout(TIMEOUT)
 
 # ---------------- FUNCTIONS ----------------
@@ -103,6 +113,30 @@ def grab_http_banner(target, port):
         return "HTTP banner grab failed"
 
 
+def show_warning(service, port):
+    warnings = {
+        "FTP": "Uses plaintext authentication",
+        "Telnet": "Unencrypted remote access",
+        "rexec": "Remote command execution (very insecure)",
+        "rlogin": "Legacy remote login protocol",
+        "rsh": "Remote shell without encryption"
+    }
+
+    if service in warnings:
+        print(f"[!] WARNING: {service} on port {port} → {warnings[service]}")
+
+
+def security_hint(service):
+    hints = {
+        "FTP": "Consider disabling FTP or switching to SFTP",
+        "Telnet": "Replace Telnet with SSH",
+        "SMB": "Disable SMBv1 and restrict access",
+        "HTTP": "Check web server for vulnerabilities",
+        "RPC": "Restrict access to trusted hosts"
+    }
+    return hints.get(service, "No specific recommendation")
+
+
 def scan_port(port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -118,15 +152,27 @@ def scan_port(port):
             else:
                 banner = grab_banner(sock)
 
+            hint = security_hint(service)
+
             message = (
                 f"[+] Port {port:<5} OPEN | "
                 f"Service: {service:<10} | "
                 f"Risk: {risk:<7} | "
-                f"Banner: {banner}"
+                f"Banner: {banner} | "
+                f"Hint: {hint}"
             )
 
             print(message)
             output.write(message + "\n")
+
+            results.append({
+                "port": port,
+                "service": service,
+                "risk": risk,
+                "banner": banner
+            })
+
+            show_warning(service, port)
 
         sock.close()
 
@@ -143,13 +189,12 @@ def worker():
         queue.task_done()
 
 # ---------------- MAIN ----------------
-# ---------------- MAIN ----------------
 
 output = open(OUTPUT_FILE, "w")
 output.write(f"Scan Target: {TARGET}\n")
 output.write(f"Ports: {START_PORT}-{END_PORT}\n")
 output.write(f"Threads: {THREAD_COUNT}\n")
-output.write("=" * 50 + "\n")
+output.write("=" * 60 + "\n")
 
 print(f"\n[*] Scanning target: {TARGET}")
 print(f"[*] Ports: {START_PORT}-{END_PORT}")
@@ -171,4 +216,16 @@ except KeyboardInterrupt:
 
 finally:
     output.close()
-    print(f"[✓] Results saved to {OUTPUT_FILE}")
+
+    with open(JSON_FILE, "w") as jf:
+        json.dump(results, jf, indent=4)
+
+    with open(CSV_FILE, "w", newline="") as cf:
+        writer = csv.DictWriter(cf, fieldnames=["port", "service", "risk", "banner"])
+        writer.writeheader()
+        writer.writerows(results)
+
+    print(f"[✓] TXT saved to {OUTPUT_FILE}")
+    print(f"[✓] JSON saved to {JSON_FILE}")
+    print(f"[✓] CSV saved to {CSV_FILE}")
+
