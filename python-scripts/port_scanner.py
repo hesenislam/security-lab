@@ -13,7 +13,6 @@ import json
 
 # ---------------- CONFIG ----------------
 TIMEOUT = 1
-MAX_THREADS = 100
 TXT_OUTPUT = "scan_results.txt"
 JSON_OUTPUT = "scan_results.json"
 
@@ -53,7 +52,6 @@ def scan_port(target, port):
 
         if sock.connect_ex((target, port)) == 0:
             banner = grab_banner(sock)
-
             service, risk, vuln = COMMON_PORTS.get(
                 port, ("Unknown", "UNKNOWN", "")
             )
@@ -68,14 +66,12 @@ def scan_port(target, port):
 
             with lock:
                 results.append(result)
-
                 print(
                     f"[+] Port {port:<5} OPEN | "
                     f"Service: {service:<10} | "
                     f"Risk: {risk:<7} | "
                     f"Banner: {banner}"
                 )
-
                 if vuln:
                     print(f"    ⚠ Possible issue: {vuln}")
 
@@ -87,7 +83,7 @@ def scan_port(target, port):
 def save_txt(target, ports):
     with open(TXT_OUTPUT, "w") as f:
         f.write("Advanced Port Scanner Report\n")
-        f.write("=" * 45 + "\n")
+        f.write("=" * 50 + "\n")
         f.write(f"Target : {target}\n")
         f.write(f"Ports  : {ports}\n")
         f.write(f"Date   : {datetime.now()}\n\n")
@@ -108,7 +104,6 @@ def save_json(target, ports):
         "date": str(datetime.now()),
         "results": results
     }
-
     with open(JSON_OUTPUT, "w") as f:
         json.dump(report, f, indent=4)
 
@@ -116,32 +111,23 @@ def save_json(target, ports):
 def main():
     parser = argparse.ArgumentParser(
         description="Advanced Port Scanner (Educational / Lab Use)",
-        epilog="Example: python3 port_scanner.py -t 192.168.1.10 -p 1-1024"
+        epilog="Example: python3 port_scanner.py -t 192.168.1.10 -p 1-1024 --threads 100"
     )
 
     parser.add_argument("-t", "--target", required=True, help="Target IP or domain")
-    parser.add_argument("-p", "--ports", default="1-1024", help="Port range (default: 1-1024)")
+    parser.add_argument("-p", "--ports", default="1-1024", help="Port range")
+    parser.add_argument("--threads", type=int, default=100, help="Number of threads")
     parser.add_argument("--json", action="store_true", help="Save output as JSON")
-    parser.add_argument(
-    "--threads",
-    type=int,
-    default=100,
-    help="Number of threads (default: 100)"
-    )
 
     args = parser.parse_args()
 
     target = args.target
-    port_range = args.ports
-    args = parser.parse_args()
-
-TARGET = args.target
-THREAD_COUNT = args.threads
-
-    start_port, end_port = map(int, port_range.split("-"))
+    start_port, end_port = map(int, args.ports.split("-"))
+    max_threads = args.threads
 
     print("\n[*] Target :", target)
     print(f"[*] Ports  : {start_port}-{end_port}")
+    print(f"[*] Threads: {max_threads}")
     print("[*] Scan started...\n")
 
     threads = []
@@ -151,7 +137,7 @@ THREAD_COUNT = args.threads
         threads.append(t)
         t.start()
 
-        if len(threads) >= MAX_THREADS:
+        if len(threads) >= max_threads:
             for th in threads:
                 th.join()
             threads = []
@@ -159,14 +145,13 @@ THREAD_COUNT = args.threads
     for th in threads:
         th.join()
 
-    save_txt(target, port_range)
+    save_txt(target, args.ports)
 
     if args.json:
-        save_json(target, port_range)
+        save_json(target, args.ports)
 
     print("\n[✓] Scan completed successfully")
     print(f"[✓] TXT saved : {TXT_OUTPUT}")
-
     if args.json:
         print(f"[✓] JSON saved: {JSON_OUTPUT}")
 
