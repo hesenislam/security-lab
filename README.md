@@ -13,3 +13,10 @@ This repository contains my cybersecurity labs, practice exercises, and scripts 
 
 ## Status
 This repository is actively maintained and updated as I continue learning and practicing cybersecurity concepts.
+### Port Scanner
+A basic Python TCP port scanner created for learning networking and cybersecurity fundamentals.
+Features:
+- Custom port range scanning
+- Timeout handling
+- Clean output
+
