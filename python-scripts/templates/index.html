@@ -1,40 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Advanced Port Scanner</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
 <h1>🔐 Advanced Port Scanner</h1>
 
-<form method="POST">
-    <input type="text" name="target" placeholder="Target IP / Domain" required>
-    <input type="number" name="start_port" placeholder="Start Port" value="1">
-    <input type="number" name="end_port" placeholder="End Port" value="1024">
-    <button type="submit">Scan</button>
-</form>
-
-<hr>
-
-{% if results %}
 <table>
-    <tr>
-        <th>Port</th>
-        <th>Service</th>
-        <th>Risk</th>
-        <th>Banner</th>
-    </tr>
-    {% for r in results %}
-    <tr>
-        <td>{{ r.port }}</td>
-        <td>{{ r.service }}</td>
-        <td>{{ r.risk }}</td>
-        <td>{{ r.banner }}</td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>Port</th>
+            <th>Service</th>
+            <th>Risk</th>
+            <th>Banner</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in results %}
+        <tr>
+            <td>{{ r.port }}</td>
+            <td>{{ r.service }}</td>
+
+            {% if r.risk == "HIGH" %}
+                <td class="risk-high">{{ r.risk }}</td>
+            {% elif r.risk == "MEDIUM" %}
+                <td class="risk-medium">{{ r.risk }}</td>
+            {% else %}
+                <td class="risk-low">{{ r.risk }}</td>
+            {% endif %}
+
+            <td class="banner">{{ r.banner }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
-{% endif %}
 
 </body>
 </html>
