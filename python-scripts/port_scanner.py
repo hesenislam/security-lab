@@ -40,6 +40,25 @@ def grab_banner(sock):
         return sock.recv(1024).decode().strip()
     except:
         return "No banner"
+def grab_http_banner(target, port):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        sock.connect((target, port))
+
+        request = f"GET / HTTP/1.1\r\nHost: {target}\r\n\r\n"
+        sock.send(request.encode())
+
+        response = sock.recv(2048).decode(errors="ignore")
+        sock.close()
+
+        for line in response.split("\r\n"):
+            if "Server:" in line:
+                return line
+        return "HTTP server (no Server header)"
+    except:
+        return "HTTP banner grab failed"
+
 
 def scan_port(port):
     try:
@@ -48,7 +67,11 @@ def scan_port(port):
 
         if result == 0:
             service = COMMON_PORTS.get(port, "Unknown")
-            banner = grab_banner(sock)
+            if port in [80, 443]:
+    banner = grab_http_banner(TARGET, port)
+else:
+    banner = grab_banner(sock)
+
             print(f"[+] Port {port:<5} OPEN | Service: {service:<10} | Banner: {banner}")
 
         sock.close()
