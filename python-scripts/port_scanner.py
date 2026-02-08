@@ -33,6 +33,21 @@ COMMON_PORTS = {
     3389: "RDP"
 }
 
+RISK_LEVELS = {
+    "FTP": "HIGH",
+    "Telnet": "HIGH",
+    "rexec": "HIGH",
+    "rlogin": "HIGH",
+    "rsh": "HIGH",
+    "SMB": "MEDIUM",
+    "NetBIOS": "MEDIUM",
+    "HTTP": "LOW",
+    "SSH": "LOW",
+    "SMTP": "LOW",
+    "RPC": "LOW"
+}
+
+
 queue = Queue()
 socket.setdefaulttimeout(TIMEOUT)
 
@@ -82,13 +97,21 @@ def scan_port(port):
 
         if result == 0:
             service = COMMON_PORTS.get(port, "Unknown")
+            risk = RISK_LEVELS.get(service, "UNKNOWN")
+
 
             if port in [80, 443]:
                 banner = grab_http_banner(TARGET, port)
             else:
                 banner = grab_banner(sock)
 
-            print(f"[+] Port {port:<5} OPEN | Service: {service:<10} | Banner: {banner}")
+        print(
+    f"[+] Port {port:<5} OPEN | "
+    f"Service: {service:<10} | "
+    f"Risk: {risk:<7} | "
+    f"Banner: {banner}"
+)
+
 
         sock.close()
     except:
