@@ -1,3 +1,6 @@
+# Author: Hesen Islamli
+# Basic Port Scanner(Educational Purposes Only)
+# Work in Progress
 import socket
 
 target = input("Enter target IP or hostname: ")
