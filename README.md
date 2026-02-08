@@ -14,7 +14,7 @@ It showcases my practical skills in **networking, Linux, Python scripting, and b
 🐍 Python | Networking | Linux | Security Labs  
 
 GitHub: https://github.com/hesenislam  
-LinkedIn: (LinkedIn linkini buraya əlavə et)
+LinkedIn: www.linkedin.com/in/həsən-islamlı-400a4934b
 
 ---
 
@@ -53,6 +53,7 @@ A multi‑threaded Python port scanner designed for **educational and lab use**.
 
 ```bash
 python3 port_scanner.py -t 192.168.186.139 -p 1-1024 --threads 100
+
 ⚠ Disclaimer
 
 All tools and scripts in this repository are intended strictly for educational purposes and controlled lab environments.
