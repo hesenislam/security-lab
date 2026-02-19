@@ -89,7 +89,7 @@ def scan(target, start_port, end_port):
         th.join()
 
     return sorted(results, key=lambda x: x["port"])
-    if __name__ == "__main__":
+   if __name__ == "__main__":
     target = "scanme.nmap.org"
     start_port = 20
     end_port = 100
