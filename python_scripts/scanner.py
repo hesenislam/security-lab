@@ -89,6 +89,19 @@ def scan(target, start_port, end_port):
         th.join()
 
     return sorted(results, key=lambda x: x["port"])
+    if __name__ == "__main__":
+    target = "scanme.nmap.org"
+    start_port = 20
+    end_port = 100
+
+    results = scan(target, start_port, end_port)
+
+    if not results:
+        print("No open ports found.")
+    else:
+        for r in results:
+            print(f"[+] Port {r['port']} open | {r['service']} | Risk: {r['risk']}")
+
 
 # python-scripts/scanner.py
 
