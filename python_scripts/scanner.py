@@ -79,15 +79,6 @@ def scan(target, start_port, end_port):
         )
         threads.append(t)
         t.start()
-# python-scripts/scanner.py
-
-def scan_results():
-    return [
-        {"port": 21, "service": "FTP", "risk": "HIGH", "banner": "vsFTPd 2.3.4"},
-        {"port": 22, "service": "SSH", "risk": "LOW", "banner": "OpenSSH"},
-        {"port": 23, "service": "Telnet", "risk": "HIGH", "banner": "No banner"},
-    ]
-        
 
         if len(threads) >= MAX_THREADS:
             for th in threads:
@@ -98,3 +89,12 @@ def scan_results():
         th.join()
 
     return sorted(results, key=lambda x: x["port"])
+
+# python-scripts/scanner.py
+
+def scan_results():
+    return [
+        {"port": 21, "service": "FTP", "risk": "HIGH", "banner": "vsFTPd 2.3.4"},
+        {"port": 22, "service": "SSH", "risk": "LOW", "banner": "OpenSSH"},
+        {"port": 23, "service": "Telnet", "risk": "HIGH", "banner": "No banner"},
+    ]
